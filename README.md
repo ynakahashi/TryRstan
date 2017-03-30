@@ -1,2 +1,2 @@
 # TryRstan
-In order to learn Rstan, follow the instructions of the book by Kentaro Matsuura.
+In order to learn Rstan, followed the instructions of the book written by Kentaro Matsuura.
