@@ -26,8 +26,7 @@ options(mc.cores = parallel::detectCores())
 dat <- read.csv("data-sarary-2.txt", stringsAsFactors = F)
 
 ## plot
-dat$KID <- as.factor(dat$KID)
-gp <- ggplot(dat, aes(X, Y, shape=KID))
+gp <- ggplot(dat, aes(X, Y, shape=as.factor(KID)))
 gp <- gp + theme_bw(base_size = 18)
 gp <- gp + geom_point(size = 2)
 plot(gp)   
@@ -63,16 +62,20 @@ stan_ac(fit_01, separate_chains = T)
 
 
 ## fitting 8-2
+dat_sar <- list(N = nrow(dat),
+                X = dat$X,
+                Y = dat$Y,
+                K = length(unique(dat$KID)),
+                KID = dat$KID)
+
 fit_02 <- stan(file = 'model_8_2.stan', 
                data = dat_sar, 
                iter = 10000,
                chains = 4,
                seed = 1234)
-res_01 <- rstan::extract(fit_01)
+res_02 <- rstan::extract(fit_02)
 
 print(fit_02)
-print(summary(fit_11))
-print(summary(fit_11)$sigma)
 stan_trace(fit_02)
 stan_hist(fit_02)
 stan_dens(fit_02, separate_chains = T)
