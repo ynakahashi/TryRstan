@@ -1,9 +1,9 @@
 ################################################################################
 ##
-## Try Hierarchical Bayes Model by Rstan
+## Try Hierarchical Bayes Model by Rstan using Iris data
 ##
 ## written by Y.Nakahashi 
-## 2017/3/30
+## 2017/3/31
 ##
 ################################################################################
 
@@ -89,18 +89,18 @@ dat_sar <- list(N = nrow(dat),
                 K = length(unique(dat$KID)),
                 KID = dat$KID)
 
-fit_02 <- stan(file = 'model_8_2.stan', 
+fit_03 <- stan(file = 'model_8_3.stan', 
                data = dat_sar, 
                iter = 10000,
                chains = 4,
                seed = 1234)
-res_02 <- rstan::extract(fit_02)
+res_03 <- rstan::extract(fit_03)
 
-print(fit_02)
-stan_trace(fit_02)
-stan_hist(fit_02)
-stan_dens(fit_02, separate_chains = T)
-stan_ac(fit_02, separate_chains = T)
+print(fit_03)
+stan_trace(fit_03)
+stan_hist(fit_03)
+stan_dens(fit_03, separate_chains = T)
+stan_ac(fit_03, separate_chains = T)
 
 
 
