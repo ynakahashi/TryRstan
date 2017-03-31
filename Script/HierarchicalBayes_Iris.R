@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## Try Hierarchical Bayes Model by Rstan using Iris data
+## Build Hierarchical Bayes Model by Rstan using Iris
 ##
 ## written by Y.Nakahashi 
 ## 2017/3/31
@@ -23,32 +23,43 @@ options(mc.cores = parallel::detectCores())
 ## Run stan
 ################################################################################
 ## load sample data
-dat <- read.csv("data-sarary-2.txt", stringsAsFactors = F)
+data(iris)
+dat <- iris
+Species_Class <- c("setosa" = 1, "versicolor" = 2, "virginica" = 3)
+dat$Class <- Species_Class[dat$Species]
 
 ## plot
-gp <- ggplot(dat, aes(X, Y, shape=as.factor(KID)))
-gp <- gp + theme_bw(base_size = 18)
+gp <- ggplot(dat, aes(Sepal.Length, Sepal.Width, colour=Species))
+gp <- gp + theme_gray(base_size = 14)
 gp <- gp + geom_point(size = 2)
 plot(gp)   
 
 
-
 ## prepare data
-dat_sar <- list(N = nrow(dat),
-                X = dat$X,
-                Y = dat$Y,
-                KID = dat$KID)
+dat_Iris <- list(N = nrow(dat),
+                 X = dat$Sepal.Length,
+                 Y = dat$Sepal.Width,
+                 Z = dat$Petal.Length,
+                 K = length(unique(dat$Class)),
+                 Spe = dat$Class)
 
-## fitting 8-1
-fit_01 <- stan(file = 'model_8_1.stan', 
-               data = dat_sar, 
+## fitting 
+fit_01 <- stan(file = './StanModel/model_Iris.stan', 
+               data = dat_Iris, 
                iter = 10000,
                chains = 4,
                seed = 1234)
 res_01 <- rstan::extract(fit_01)
 
-## fit lm for camparison
-fit_11 <- lm(Y~X, data=dat)
+res_lm_01 <- lm(Sepal.Length~Sepal.Width, data=dat, Class == 1)
+res_lm_02 <- lm(Sepal.Length~Sepal.Width, data=dat, Class == 2)
+res_lm_03 <- lm(Sepal.Length~Sepal.Width, data=dat, Class == 3)
+
+print(cbind(
+   summary(res_lm_01)$coefficient[, 1],
+   summary(res_lm_02)$coefficient[, 1],
+   summary(res_lm_03)$coefficient[, 1]))
+
 
 ## plot result
 print(fit_01)
@@ -58,54 +69,4 @@ stan_trace(fit_01)
 stan_hist(fit_01)
 stan_dens(fit_01, separate_chains = T)
 stan_ac(fit_01, separate_chains = T)
-
-
-
-## fitting 8-2
-dat_sar <- list(N = nrow(dat),
-                X = dat$X,
-                Y = dat$Y,
-                K = length(unique(dat$KID)),
-                KID = dat$KID)
-
-fit_02 <- stan(file = 'model_8_2.stan', 
-               data = dat_sar, 
-               iter = 10000,
-               chains = 4,
-               seed = 1234)
-res_02 <- rstan::extract(fit_02)
-
-print(fit_02)
-stan_trace(fit_02)
-stan_hist(fit_02)
-stan_dens(fit_02, separate_chains = T)
-stan_ac(fit_02, separate_chains = T)
-
-
-## fitting 8-3
-dat_sar <- list(N = nrow(dat),
-                X = dat$X,
-                Y = dat$Y,
-                K = length(unique(dat$KID)),
-                KID = dat$KID)
-
-fit_03 <- stan(file = 'model_8_3.stan', 
-               data = dat_sar, 
-               iter = 10000,
-               chains = 4,
-               seed = 1234)
-res_03 <- rstan::extract(fit_03)
-
-print(fit_03)
-stan_trace(fit_03)
-stan_hist(fit_03)
-stan_dens(fit_03, separate_chains = T)
-stan_ac(fit_03, separate_chains = T)
-
-
-
-
-
-
-
 
