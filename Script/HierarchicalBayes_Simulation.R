@@ -22,17 +22,18 @@ options(mc.cores = parallel::detectCores())
 
 
 ################################################################################
-## Create data
+## Set parameters for simulation data
 ################################################################################
-## set parameters
+## set seed
+set.seed(123)
+
 ## number of data
 num_week   <- 52
 num_year   <- 4
 num_region <- 10
 
 ## seasonal effects
-set.seed(123)
-p <- 0.7
+p <- 0.7 # just a threshold
 season_eff <- sin(1:num_week) * 5 *  ifelse(runif(num_week) > p, 1, 0)
 plot(season_eff, type="l")
 
@@ -46,6 +47,7 @@ beta_Digi_AS_0 <- c(0.010, 0.003) # hyper-parameter for Digital ad-stock
 beta_TV_AS     <- rnorm(num_region, beta_TV_AS_0[1], beta_TV_AS_0[2])
 beta_Digi_AS   <- rnorm(num_region, beta_Digi_AS_0[1], beta_Digi_AS_0[2])
 
+## 
 
 
 
