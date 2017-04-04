@@ -18,8 +18,8 @@ setwd(work_dir)
 
 ## load rstan
 library(rstan)
-rstan_options(auto_write = TRUE)
-options(mc.cores = parallel::detectCores())
+# rstan_options(auto_write = TRUE)
+# options(mc.cores = parallel::detectCores())
 
 
 ################################################################################
@@ -37,7 +37,7 @@ region_name  <- 1:num_region
 
 ## seasonal effects
 p <- 0.7 # just a threshold value for seasonal effect
-season_eff <- sin(1:num_week) * 1 *  ifelse(runif(num_week) > p, 1, 0)
+season_eff <- sin(1:num_week) *  ifelse(runif(num_week) > p, 1, 0)
 plot(season_eff, type="l")
 
 ## intercept
@@ -137,3 +137,10 @@ stan_hist(fit_01)
 stan_dens(fit_01, separate_chains = T)
 stan_ac(fit_01, separate_chains = T)
 
+
+## fitting 02
+fit_02 <- stan(file = './StanModel/model_Simulation_02.stan', 
+               data = dat_Ord, 
+               iter = 1000,
+               chains = 4,
+               seed = 1234)
