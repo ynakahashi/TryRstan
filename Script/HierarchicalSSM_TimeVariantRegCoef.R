@@ -30,12 +30,13 @@ library(rstan)
 #                  repos = NULL, type="source")
 # library(sspir)
 
+
 ################################################################################
 ## Data Simulation
 ## Assume following model:
 ##   Model 1 : log(Y_ti) ~ state_ti + beta_ti * X_ti + error_ti
 ################################################################################
-####### simulation parameter settings
+####### simulation parameters settings
 ## set seed
 set.seed(123)
 
@@ -64,7 +65,7 @@ var_beta_X <- 0.000001
 
 ##### simulate data
 ## X
-X_0 <- c(10, 20, 30, 30, 0, 0, 0, 20, 30, 40, 0, 30)
+X_0 <- ceiling(cos(5:17)*10+10)
 X   <- matrix(numeric(data_length * num_region), nrow = data_length)
 scl_TV <- 5
 
