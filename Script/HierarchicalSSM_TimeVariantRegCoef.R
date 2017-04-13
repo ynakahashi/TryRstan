@@ -22,8 +22,8 @@ library(tidyr)
 
 ## load rstan
 library(rstan)
-# rstan_options(auto_write = TRUE)
-# options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
 
 ## install & load sspir
 # install.packages("/Users/nakahashi/Downloads/sspir_0.2.10.tar.gz",
@@ -105,8 +105,11 @@ state_DF <- as.data.frame(state) %>%
 
 ## beta of X
 beta_X <- matrix(numeric(data_length * num_region), nrow = data_length)
+beta_X[1, ] <- 
 for (i in 1:num_region) {
-   beta_X[, i] <- beta_X_0 + rnorm(data_length, 0, sd = sqrt(var_beta_X))
+   for (j in 2:data_length) {
+      beta_X[j, i] <- beta_X_0[j] + rnorm(1, 0, sd = sqrt(var_TV))
+   }
 }
 beta_X_DF <- as.data.frame(beta_X) %>% 
    gather() %>% 
@@ -135,45 +138,69 @@ dat_Ana <- data.frame(
    "X"        = X_DF$value
 )
 
+# plot(dat_Ana$OrderNum, type="l")
+# plot(dat_Ana$LogOrder, type="l")
+# plot(dat_Ana$X, type="l")
 
 ################################################################################
 ## Run stan
 ################################################################################
 ## model
-dat_Ord <- list(N = nrow(dat_Ana),
+dat_Ord <- list(N = nrow(dat_Ana)/length(unique(dat_Ana$Area)),
                 Y = dat_Ana$LogOrder,
                 K = length(unique(dat_Ana$Area)),
                 X = dat_Ana$X)
 
 ## fitting 
-fit_01 <- stan(file = './StanModel/model_SSM_TVRC_Sim.stan', 
+fit_01 <- stan(file = './StanModel/HierarchicalSSM_TimeVariantRegCoef_Sim.stan', 
                data = dat_Ord, 
                iter = 10000,
                chains = 4,
                seed = 1234)
 
-## extract results
-res_01 <- rstan::extract(fit_01)
-# mu
-summary(fit_01)$summary
 
-# coefficient
-summary(fit_01)$summary[51, 1]
-beta_TV_0[1]
+################################################################################
+## extract results
+################################################################################
+## sample
+res_01 <- rstan::extract(fit_01)
+
+## parameters
+ests <- summary(fit_01)$summary
+state_rows <- rownames(ests)[grep("state_t*", rownames(ests))]
+beta_rows  <- rownames(ests)[grep("beta_*", rownames(ests))]
+
+## state
+state_par <- ests %>% data.frame %>% select(mean) %>% 
+   mutate("Par" = rownames(ests)) %>% 
+   filter(Par %in% state_rows)
+est_state <- state_par$mean[2:(length(state_par$mean)-1)]
+plot(est_state, type="l")
+
+
+## regression coefficient
+beta_par <- ests %>% data.frame %>% select(mean) %>% 
+   mutate("Par" = rownames(ests)) %>% 
+   filter(Par %in% beta_rows)
+est_beta <- beta_par$mean[2:(length(beta_par$mean)-1)]
+plot(est_beta, type="l")
 
 
 ## compare true & estimate parameters
-plot(cbind(summary(fit_01)$summary[2:49, 1], mu))
-plot(mu, type="b")
-lines(summary(fit_01)$summary[2:49, 1], col=2) 
+plot(cbind(state_DF$value, est_state))
+plot(state_DF$value, type="b")
+lines(est_state, col=2) 
 
-plot(cbind(summary(fit_01)$summary[52:99, 1], beta_TV))
-plot(beta_TV, type="b")
-lines(summary(fit_01)$summary[52:99, 1], col=2) 
+plot(cbind(beta_X_DF$value, est_beta))
+plot(beta_X_DF$value, type="b")
+lines(est_beta, col=2) 
 
-plot(summary(fit_01)$summary[52:99, 1], type="b") 
-lines(beta_TV, col=2) 
+y_hat <- est_state + dat_Ana$X * est_beta
+plot(dat_Ana$LogOrder, y_hat)
+plot(dat_Ana$LogOrder, type="b")
+lines(y_hat, col=2)
 
+## sampling check
 stan_trace(fit_01)
 stan_hist(fit_01)
 stan_dens(fit_01, separate_chains = T)
