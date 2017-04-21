@@ -12,8 +12,8 @@
 ## Environmental Settings
 ################################################################################
 ## set working directory
-work_dir <- "/Users/nakahashi/Desktop/GitTest/TryRstan"
-# work_dir <- "/Users/ynakahashi/Desktop/ynakahashi_git/TryRstan"
+# work_dir <- "/Users/ynakahashi/Desktop/ynakahashi_git/TryRstan" # Deloitte PC
+work_dir <- "/Users/nakahashi/Desktop/GitTest/TryRstan" # Private PC
 setwd(work_dir)
 
 ## load libraries
@@ -57,7 +57,7 @@ var_state <- 0.01
 ## white noise
 var_error <- 0.000025
 
-## regression coefficients of X
+## time-variant regression coefficients of X
 beta_X_0   <- sin(seq(1, 3, length=data_length))/100
 var_beta_X <- 0.000001
 
