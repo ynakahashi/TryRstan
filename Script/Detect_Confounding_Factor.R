@@ -24,7 +24,7 @@ options(mc.cores = parallel::detectCores())
 ################################################################################
 ## Simulate confounded data
 ################################################################################
-set.seed(123)
+set.seed(15)
 N      <- 100
 x_real <- rnorm(N)
 x_spur <- rnorm(N, x_real)
