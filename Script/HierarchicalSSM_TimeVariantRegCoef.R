@@ -12,8 +12,7 @@
 ## Environmental Settings
 ################################################################################
 ## set working directory
-# work_dir <- "/Users/ynakahashi/Desktop/ynakahashi_git/TryRstan" # Deloitte PC
-work_dir <- "/Users/nakahashi/Desktop/GitTest/TryRstan" # Private PC
+work_dir <- "/Users/nakahashi/Desktop/Git/TryRstan" # Private PC
 setwd(work_dir)
 
 ## load libraries
@@ -24,11 +23,6 @@ library(tidyr)
 library(rstan)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
-
-## install & load sspir
-# install.packages("/Users/nakahashi/Downloads/sspir_0.2.10.tar.gz",
-#                  repos = NULL, type="source")
-# library(sspir)
 
 
 ################################################################################
@@ -41,10 +35,10 @@ options(mc.cores = parallel::detectCores())
 set.seed(123)
 
 ## number of data
-num_week    <- 12
+num_month   <- 12
 num_year    <- 4
 num_region  <- 5
-data_length <- num_week * num_year
+data_length <- num_month * num_year
 
 ## distributions of
 ## state_t0
@@ -58,14 +52,14 @@ var_state <- 0.01
 var_error <- 0.000025
 
 ## time-variant regression coefficients of X
-beta_X_0   <- sin(seq(1, 3, length=data_length))/100
+beta_X_0   <- sin(seq(1, 3, length = data_length))/100
 var_beta_X <- 0.000001
 
 
 
 ##### simulate data
 ## X
-X_0 <- ceiling(cos(5:17)*10+10)
+X_0 <- rpois(, 10)
 X   <- matrix(numeric(data_length * num_region), nrow = data_length)
 scl_TV <- 5
 

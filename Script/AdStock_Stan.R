@@ -48,7 +48,7 @@ simulate_y <- function(pars) {
    
    error <- rnorm(n, 0, sqrt(var_e))
    
-   y     <- mu + beta_01 * X_01_fil + beta_02 * X_02_fil + error
+   y     <- as.vector(mu + beta_01 * X_01_fil + beta_02 * X_02_fil + error)
    dat <- data.frame(
       "Y"          = y,
       "X_01"       = X_01_raw,
